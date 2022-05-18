@@ -1,14 +1,16 @@
+let test1 = "👇🤜👇👇👇👇👇👇👇👉👆👈🤛👉👇👊👇🤜👇👉👆👆👆👆👆👈🤛👉👆👆👊👆👆👆👆👆👆👆👊👊👆👆👆👊";
+let test2 = "👉👆👆👆👆👆👆👆👆🤜👇👈👆👆👆👆👆👆👆👆👆👉🤛👈👊👉👉👆👉👇🤜👆🤛👆👆👉👆👆👉👆👆👆🤜👉🤜👇👉👆👆👆👈👈👆👆👆👉🤛👈👈🤛👉👇👇👇👇👇👊👉👇👉👆👆👆👊👊👆👆👆👊👉👇👊👈👈👆🤜👉🤜👆👉👆🤛👉👉🤛👈👇👇👇👇👇👇👇👇👇👇👇👇👇👇👊👉👉👊👆👆👆👊👇👇👇👇👇👇👊👇👇👇👇👇👇👇👇👊👉👆👊👉👆👊";
+
 let memory = [];
 let currentPosition = 0;
-let positionStartLoop = 0;
-let positionEndLoop = 0;
+let positionStartLoop = null;
+let positionStartLoopNested = null;
+let positionEndLoop = null;
+let positionEndLoopNested = null;
 
 
-
-
-
-const translate = () => {
-    let input = "👇🤜👇👇👇👇👇👇👇👉👆👈🤛👉👇👊👇🤜👇👉👆👆👆👆👆👈🤛👉👆👆👊👆👆👆👆👆👆👆👊👊👆👆👆👊";
+const translate = (code) => {
+    let input = code;
     let correctInput = [];
     let provisionalString = "";
     //GUARDA EN UN ARRAY EL INPUT DE MANERA CORRECTA
@@ -22,6 +24,7 @@ const translate = () => {
             correctInput.push(provisionalString);
         }
     }
+    //RECORRE EL ARRAY CORRECTO E INTERPRETA CADA MANO
     for (let i = 0; i < correctInput.length; i++) {
         switch (correctInput[i]) {
             case '👇':
@@ -48,6 +51,9 @@ const translate = () => {
 
             case '👉':
                 currentPosition++;
+                if(memory[currentPosition] === undefined){
+                    memory[currentPosition] = 0;
+                };
                 break;
 
             case '👈':
@@ -55,30 +61,81 @@ const translate = () => {
                 break;
 
             case '🤜':
-                positionStartLoop = i;
-                if (memory[currentPosition] === 0) {
-                    i = positionEndLoop;
+                if (positionStartLoop === null) {
+                    positionStartLoop = i;
+                } else{
+                    positionStartLoopNested = i;
                 }
+                //BUCLE SIN ANIDAR
+                if (positionStartLoopNested === null) {
+                    if (memory[currentPosition] === 0) {
+                        i = positionEndLoop;
+                        positionStartLoop = null;
+                    }
+                } 
+                //BUCLE ANIDADO
+                else{
+                    if (memory[currentPosition] === 0) {
+                        if (!positionEndLoopNested) {
+                            for (let e = i; e < correctInput.length; e++) {
+                                if (correctInput[e] === "🤛") {
+                                    console.log(e);
+                                    console.log(correctInput[e]);
+                                    i = e-1;
+                                    break;
+                                }
+                            }
+                        } else{
+                            i = positionEndLoopNested;
+                        }
+                    }
+                }
+                
                 break;
 
             case '🤛':
-                positionEndLoop = i;
-                if (memory[currentPosition] !== 0) {
-                    i = positionStartLoop;
+                //BUCLE SIN ANIDAR
+                if (positionStartLoopNested === null) {
+                    positionEndLoop = i;
+                    if (memory[currentPosition] !== 0) {
+                        i = positionStartLoop;
+                    } else{
+                        positionStartLoop = null;
+                        positionEndLoop = null;
+                    }
+                } 
+                //BUCLE ANIDADO
+                else{
+                    positionEndLoopNested = i;
+                    if (memory[currentPosition] !== 0) {
+                        i = positionStartLoopNested;
+                    } else{
+                        positionStartLoopNested = null;
+                        positionEndLoopNested = null;
+                    }
                 }
                 break;
 
             case '👊':
-                document.getElementById("text").innerHTML = document.getElementById("text").innerHTML + (String.fromCharCode(memory[currentPosition]));
+                console.log("saco la letra " + String.fromCharCode(memory[currentPosition]));
+                console.log("en la posicion de memoria  " + currentPosition);
+                document.getElementById("text1").innerHTML = document.getElementById("text1").innerHTML + (String.fromCharCode(memory[currentPosition]));
                 break;
         
             default:
                 break;
         }
-        console.log(currentPosition);
-        console.log(memory[currentPosition]);
+        // console.log(currentPosition + " POSICION ACTUAL DE LA MEMORIA");
+        // console.log(memory[currentPosition] + " VALOR ACTUAL DE LA POSICION DE MEMORIA");
     }
-    
 }
 
-document.getElementById("send").addEventListener("click", translate);
+document.getElementById("send1").addEventListener("click", function(){
+    translate(test1);
+},
+false);
+document.getElementById("send2").addEventListener("click",function(){
+    translate(test2);
+},
+false);
+// document.getElementById("send3").addEventListener("click", translate);
