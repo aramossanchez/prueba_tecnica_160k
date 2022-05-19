@@ -4,10 +4,8 @@ let test3 = "👆👆👆👆👆👆👆👆👆👆👆👆👆🤜👇👉�
 
 let memory = [];
 let currentPosition = 0;
-let positionStartLoop = null;
-let positionStartLoopNested = null;
-let positionEndLoop = null;
-let positionEndLoopNested = null;
+let loops = [];
+let positionOfLoopsBegin = [];
 
 
 const translate = (code, text) => {
@@ -25,6 +23,19 @@ const translate = (code, text) => {
             correctInput.push(provisionalString);
         }
     }
+    //CÁLCULO ARRAY DE LOOPS
+    for (let i = 0; i < correctInput.length; i++) {
+        if (correctInput[i] === "🤜") {
+            loops.push([i]);
+            positionOfLoopsBegin.push(i);
+        }
+        if (correctInput[i] === "🤛") {
+            let numberOfLoop = loops.findIndex(array => array.find(key => key === positionOfLoopsBegin[positionOfLoopsBegin.length - 1]));
+            loops[numberOfLoop].push(i);
+            positionOfLoopsBegin.pop();
+        }
+    }
+    console.log(loops);
     //RECORRE EL ARRAY CORRECTO E INTERPRETA CADA MANO
     for (let i = 0; i < correctInput.length; i++) {
         switch (correctInput[i]) {
@@ -66,84 +77,22 @@ const translate = (code, text) => {
                 break;
 
             case '🤜':
-                if (positionStartLoop === null) {
-                    positionStartLoop = i;
-                } else{
-                    positionStartLoopNested = i;
-                }
-                //BUCLE SIN ANIDAR
-                if (positionStartLoopNested === null) {
-                    if (memory[currentPosition] === 0) {
-                        if (positionEndLoop === null) {
-                            for (let e = i+1; e < correctInput.length; e++) {
-                                if (positionEndLoopNested !== null && correctInput[e] === "🤛") {
-                                    positionStartLoopNested = null;
-                                    positionEndLoopNested = null;
-                                    i = e;
-                                }
-                                if (positionStartLoopNested !== null && correctInput[e] === "🤛") {
-                                    positionEndLoopNested = e;
-                                }
-                                if (correctInput[e] === "🤜") {
-                                    positionStartLoopNested = e;
-                                }
-                            }
-                        } else{
-                            i = positionEndLoop;
-                        }
-                        positionStartLoop = null;
-                    }
-                }
-                //BUCLE ANIDADO
-                else {
-                    console.log("************************");
-                    console.log("SOY UN BUCLE ANIDADO, Y MI POSICION DE COMIENZO ES " + positionStartLoopNested);
-                    console.log("MI VALOR DE MEMORIA ES " + memory[currentPosition]);
-                    console.log(memory);
-                    if (memory[currentPosition] === 0) {
-                        if(positionEndLoopNested === null){
-                            for (let e = i + 1; e < correctInput.length; e++) {
-                                if (correctInput[e] === "🤛" && positionEndLoopNested === null) {
-                                    i = e + 1;
-                                    positionEndLoopNested = i;
-                                    console.log("entro aqui")
-                                    console.log(i + " con esta i")
-                                    console.log("************************")
-                                }
-                            }
-                        } else{
-                            i = positionEndLoopNested;
-                        }
-                        positionEndLoopNested = null;
-                    }
+                if (memory[currentPosition] === 0) {
+                    let numberOfLoop = loops.findIndex(array => array.find(key => key === i));
+                    i = loops[numberOfLoop][1];
                 }
                 break;
 
             case '🤛':
-                //BUCLE SIN ANIDAR
-                if (positionStartLoopNested === null) {
-                    positionEndLoop = i;
-                    if (memory[currentPosition] !== 0) {
-                        i = positionStartLoop;
-                    } else{
-                        positionStartLoop = null;
-                        positionEndLoop = null;
-                    }
-                } 
-                //BUCLE ANIDADO
-                else{
-                    positionEndLoopNested = i;
-                    if (memory[currentPosition] !== 0) {
-                        i = positionStartLoopNested;
-                    } else{
-                        positionStartLoopNested = null;
-                        positionEndLoopNested = null;
-                    }
+                if (memory[currentPosition] !== 0) {
+                    let numberOfLoop = loops.findIndex(array => array.find(key => key === i));
+                    i = loops[numberOfLoop][0];
                 }
                 break;
 
             case '👊':
                 console.log(i + " POSICION DE LA MANO " + correctInput[i]);
+                console.log("ESTOY IMPRIMIENDO " + String.fromCharCode(memory[currentPosition]));
                 document.getElementById(text).innerHTML = document.getElementById(text).innerHTML + (String.fromCharCode(memory[currentPosition]));
                 break;
         
