@@ -1,9 +1,9 @@
 # prueba_tecnica_160k
 
-# Introduction
+# INTRODUCCIÓN
 
-You find a strange mirror that always shows a hand that is moving. 
-The hand appears to be alive, and after a lot of questions of "yes" and "no" answer, you know that the hand is trying to teach you a program that is written in HPL (Hand Programming Language).
+Te encuentras un espejo extraño que siempre enseña una mano que se está moviendo.
+La mano parece estar viva, y después de muchas preguntas de respuesta "si" o "no", sabes que la mano está intentando enseñarte un programa que está escrito en LMP (Lenguaje Mano de Programación).
 
 This language works with a memory of an indefinite size of bytes, with all values initialized to 0.
 This language haves 7 instructions:
